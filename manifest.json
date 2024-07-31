@@ -1,0 +1,98 @@
+{
+    "include": [
+        "$(MODDABLE)/examples/manifest_base.json",
+        "$(MODDABLE)/examples/manifest_net.json",
+        "$(MODULES)/files/preference/manifest.json",
+        "$(MODULES)/network/mdns/manifest.json",
+        "$(MODULES)/crypt/tls.json",
+        "$(MODULES)/network/http/manifest.json",
+        "$(MODULES)/pins/digital/manifest.json",
+        "$(MODULES)/pins/analog/manifest.json",
+        "$(MODDABLE)/modules/network/mqtt/manifest.json",
+		"$(MODDABLE)/modules/network/ble/manifest_client.json"
+    ],
+
+    "modules": {
+        "*": [
+            "$(MODULES)/network/http/*",
+            "$(MODULES)/base/instrumentation/*",
+            "$(MODULES)/drivers/onewire/*",
+            "./main"
+        ],
+        "net": "$(MODULES)/network/net/netmdns",
+		"dns/server": "$(MODULES)/network/dns/dnsserver"
+    },
+
+    "preload": [
+        "http",
+        "instrumentation",
+        "net",
+		"dns/server",
+        "onewire",
+		"DS18X20"
+    ],
+
+    "resources": {
+        "*": [
+            "$(MODULES)/crypt/data/ca109.der"
+        ]
+    },
+    "config": {
+        "sntp": "pool.ntp.org"
+    },
+    "platforms": {
+		"esp": {
+			"include": [
+				"$(MODULES)/pins/digital/manifest.json"
+			],
+			"modules": {
+				"*": [
+					"$(MODULES)/drivers/onewire/esp/*"
+				]
+			},
+			"config": {
+				"onewire": {
+					"pin": "4"
+				}
+			},
+			"defines": {
+				"onewire": {
+					"driver_gpio": "GPIO"
+				}
+			}
+		},
+		"esp32": {
+			"include": [
+				"$(MODULES)/pins/digital/manifest.json"
+			],
+			"modules": {
+				"*": "$(MODULES)/drivers/onewire/esp/*"
+			},
+			"config": {
+				"onewire": {
+					"pin": "16"
+				}
+			},
+			"defines": {
+				"onewire": {
+					"driver_rmt": "RMT",
+					"rmt_rx_channel": "RMT_CHANNEL_2",
+					"rmt_tx_channel": "RMT_CHANNEL_3"
+				}
+			}
+		},
+		"win": {
+			"modules": {
+				"*": "$(MODULES)/drivers/onewire/sim/*"
+			},
+			"config": {
+				"onewire": {
+					"pin": "1"
+				}
+			}
+		},
+		"...": {
+			"error": "unsupported platform"
+		}
+	}
+}
